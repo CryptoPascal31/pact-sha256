@@ -3,9 +3,9 @@
   ;
   ; This module implements the full sha256 specifications.
   ; The public function (digest ) is supposed from 3rd party codes.
-  ;   - This function accept a list of padded 512 bits blocks (according to FIPS.180-4 § 5.1.1)
+  ;   - This function accepts a list of padded '512 bits blocks' (according to FIPS.180-4 § 5.1.1)
   ;
-  ; The function (pad-int) can be used to create a list of SHA256 512 bits blocks from an integer up to 959 bits
+  ; The function (pad-int) can be used to create a list of SHA256 blocks from an integer up to 959 bits
 
   (defcap GOV ()
     (enforce false "Not upgradable module"))
@@ -120,7 +120,7 @@
     (xor (xor (rotr-17 x) (rotr-19 x)) (shift x -10)))
 
   (defun block-to-words:[integer] (x:integer)
-    @doc "Compute Wi for a 512 bits according to FIPS.180-4 § 6.2.2 (step 1)"
+    @doc "Compute Wi for a '512 bits block' according to FIPS.180-4 § 6.2.2 (step 1)"
     (let* (
       (w0  (take-word x -480))
       (w1  (take-word x -448))
@@ -217,14 +217,14 @@
   )
 
   (defun reg-to-int:integer (x:object{register})
-    @doc "Last step to compute 256 bits Digest according to FIPS.180-4 § 6.2.2 (Postabule)"
+    @doc "Last step to compute 256 bits Digest according to FIPS.180-4 § 6.2.2 (Postambule)"
     (bind x {'a:=xa, 'b:=xb, 'c:=xc, 'd:=xd, 'e:=xe, 'f:=xf, 'g:=xg, 'h:=xh}
       (fold (|) 0 (zip (shift) [xh xg xf xe xd xc xb xa]
                                (enumerate 0 256 32))))
   )
 
   (defun digest:integer (input:[integer])
-    @doc "Compute the hash from a list of 512 bits blocks according to FIPS.180-4 § 6.2.2"
+    @doc "Compute the hash from a list of '512 bits blocks' according to FIPS.180-4 § 6.2.2"
     (reg-to-int (fold (do-block) INITIAL-HASH input))
   )
 

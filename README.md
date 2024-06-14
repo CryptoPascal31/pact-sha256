@@ -5,8 +5,8 @@ Targets mainly on-chain BTC headers verification.
 
 This module implements the full sha256 specifications.
 
-The public function `(digest )` is supposed from 3rd party codes.
-  - This function accept a list of padded 512 bits blocks (according to FIPS.180-4 § 5.1.1)
+The public function `(digest )` is supposed to be called from 3rd party code.
+  - This function accepts a list of padded 512 bits blocks (according to FIPS.180-4 § 5.1.1)
 
 The function `(pad-int)` can be used to create a list of SHA256 512 bits blocks from an integer up to 959 bits.
 For bigger size, you have to build your own padding functions.
@@ -26,9 +26,9 @@ Result:
 ```
 
 ### Tests
-Use standard NIST test suites: "https://csrc.nist.gov/Projects/Cryptographic-Algorithm-Validation-Program/Secure-Hashing" (Bit oriented: ShortMsg + First 4 vectors of LongMsg)
+Units tests use standard NIST test suites: "https://csrc.nist.gov/Projects/Cryptographic-Algorithm-Validation-Program/Secure-Hashing" (Bit oriented: ShortMsg + First 4 vectors of LongMsg)
 
-Rebuilding the test suite require a Python interpreter
+Rebuilding the test suite requires a Python interpreter
 
 ```sh
 make tests
