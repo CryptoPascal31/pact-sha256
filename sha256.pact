@@ -42,7 +42,7 @@
                                            "748f82ee" "78a5636f" "84c87814" "8cc70208" "90befffa" "a4506ceb" "bef9a3f7" "c67178f2"]))
 
   ; Some util functions
-  (defconst BASE-256 (^ 2 32))
+  (defconst BASE-32 (^ 2 32))
   (defconst MASK-32 (mask 32))
 
   (defun mask (nbits:integer)
@@ -50,18 +50,18 @@
     (- (shift 1 nbits) 1))
 
   (defun mod+:integer (x:integer y:integer)
-    @doc "Sum 2 integers modulo 256"
-    (mod (+ x y) BASE-256))
+    @doc "Sum 2 integers modulo 2^32"
+    (mod (+ x y) BASE-32))
 
   (defun sum-4:integer (x:integer y:integer z:integer zz:integer)
     @doc "Sum 4 integers"
     (+ (+ x y) (+ z zz)))
 
   (defun modsum-4:integer (x:integer y:integer z:integer zz:integer)
-    @doc "Sum 4 integers modulo 256"
-    (mod (+ (+ x y) (+ z zz)) BASE-256))
+    @doc "Sum 4 integers modulo 2^32"
+    (mod (+ (+ x y) (+ z zz)) BASE-32))
 
-  (defun take-word (x:integer position:integer)
+  (defun take-word:integer (x:integer position:integer)
     @doc "Take a 32 bits word at a given position inside an integer"
     (& MASK-32 (shift x position)))
 
