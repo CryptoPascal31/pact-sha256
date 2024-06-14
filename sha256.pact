@@ -236,9 +236,13 @@
   (defun pad-int:[integer] (nbits:integer msg:integer)
     @doc "Pad an integer up to 959 bits according to FIPS.180-4 § 5.1.1"
     (cond
+      ; Case 1: Fit in a single block
       ((< nbits 448) [(| (pack-left (- 512 nbits) msg) nbits)])
+      ; Case 2: The msg itself + tail bit fit in a single-block but not the length
       ((< nbits 512) [(pack-left (- 512 nbits) msg) nbits])
+      ; Case 3: The msg + tail bit + length fit in 2 blocks
       ((< nbits 960) [(shift msg (- 512 nbits)) (| (pack-left (- 1024 nbits) (& (mask (- nbits 512)) msg)) nbits)])
+      ; Others cases: Not supported
       []
     )
   )
