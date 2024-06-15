@@ -1,0 +1,51 @@
+(load "sha256.pact")
+(use sha256)
+
+(module sha-256-mc-test G
+  (defcap G() true)
+
+  (defschema mc-it
+    a:integer
+    b:integer
+    c:integer
+  )
+
+  (defun ||:integer (a:integer b:integer c:integer)
+    (| (shift a 512) (| (shift b 256) c)))
+
+  (defun do-digest:integer (a:integer b:integer c:integer)
+    (digest (pad-int 768 (|| a  b c)))
+  )
+
+  (defun mc-iteration:object{mc-it} (in:object{mc-it} _:integer)
+    (bind in {'a:=a, 'b:=b, 'c:=c}
+      {'a:b, 'b:c, 'c:(do-digest a b c)})
+  )
+
+  (defun mc-round:integer (seed:integer _:integer)
+    (at 'c (fold (mc-iteration) {'a:seed, 'b:seed, 'c:seed} (enumerate 1 1000)))
+  )
+
+  (defun mc-test:integer (to-checkpoint:integer seed:integer)
+    (fold (mc-round) seed (enumerate 0 to-checkpoint))
+  )
+)
+
+; First we test Checkpoint 0
+(expect "Checkpoint 0 " (str-to-int 16 "d209f941bd2cae959edd33eb83fe81d7bddfbcc687bcb65f3855ce3738b2f45b")
+                        (mc-test 0 (str-to-int 16 "7d9959cf7db4fa58daf18a1696193dbea425b8acfa01c8cce79154baa7f29028")))
+
+(print "Checkpoint 0 passed")
+
+
+; Then Checkpoint 9
+(expect "Checkpoint 9 " (str-to-int 16 "1a456f529e47978e7258e8d59ec44c3dd54e92b7bed3d7b905901139806a57f6")
+                        (mc-test 9 (str-to-int 16 "7d9959cf7db4fa58daf18a1696193dbea425b8acfa01c8cce79154baa7f29028")))
+
+(print "Checkpoint 9 passed")
+
+; End to checkpoint 99
+;(expect "Checkpoint 99 " (str-to-int "91370c8e23ca9d4b724fe1a5c0a13e2cedb7949f04e625441bf868259894727f")
+;                        (mc-test 99 (str-to-int 16 "7d9959cf7db4fa58daf18a1696193dbea425b8acfa01c8cce79154baa7f29028")))
+;
+;(print "Checkpoint 99 passed")
