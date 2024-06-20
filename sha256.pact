@@ -69,9 +69,6 @@
   (defun rotr-2:integer (x:integer)
     (| (shift x -2) (shift x 30)))
 
-  (defun rotr-3:integer (x:integer)
-    (| (shift x -3) (shift x 29)))
-
   (defun rotr-6:integer (x:integer)
     (| (shift x -6) (shift x 26)))
 
