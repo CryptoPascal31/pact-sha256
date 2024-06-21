@@ -8,7 +8,7 @@ len_list = []
 
 
 print('(load "sha256.pact")')
-print("(use sha256)")
+print("(use sha256_mod)")
 print("(module test_cases G (defcap G() true)")
 
 def handle_test_file(fd):

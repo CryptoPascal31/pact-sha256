@@ -1,5 +1,5 @@
 (load "sha256.pact")
-(use sha256)
+(use sha256_mod)
 
 (module sha-256-mc-test G
   (defcap G() true)

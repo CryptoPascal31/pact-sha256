@@ -1,4 +1,4 @@
-(module sha256 GOV
+(module sha256_mod GOV
   ; sha256 implementation for Pact.
   ;
   ; This module implements the full sha256 specifications.

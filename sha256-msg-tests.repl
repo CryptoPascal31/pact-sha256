@@ -1,5 +1,5 @@
 (load "sha256.pact")
-(use sha256)
+(use sha256_mod)
 (module test_cases G (defcap G() true)
    (defconst MSG-0 (str-to-int 16 "00"))
    (defconst MD-0 (str-to-int 16 "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"))
