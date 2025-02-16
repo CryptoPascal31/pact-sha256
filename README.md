@@ -26,7 +26,7 @@ Result:
 ```
 
 ### Tests
-Units tests use standard NIST test suites: "https://csrc.nist.gov/Projects/Cryptographic-Algorithm-Validation-Program/Secure-Hashing" (Bit oriented: ShortMsg + First 4 vectors of LongMsg + Checkpoint 9 of the Monte-Carlo)
+Units tests use standard NIST test suites: "https://csrc.nist.gov/Projects/Cryptographic-Algorithm-Validation-Program/Secure-Hashing" (Bit oriented: ShortMsg + First 4 vectors of LongMsg + Checkpoint 1 to 99 of the Monte-Carlo Test procedure)
 
 Rebuilding the test suite requires a Python interpreter
 

@@ -1,4 +1,10 @@
+
+(enforce-pact-version "5.0")
+(begin-tx)
 (load "sha256.pact")
+(commit-tx)
+
+(begin-tx)
 (use sha256_mod)
 
 (module sha-256-mc-test G
@@ -9,6 +15,18 @@
     b:integer
     c:integer
   )
+
+  (deftable it-table:{mc-it})
+
+  (defun init (seed:integer)
+    (write it-table "" {'a:seed, 'b:seed, 'c:seed}))
+
+  (defun get-result ()
+    (with-read it-table "" {'c:=result}
+      result))
+
+  (defun re-seed ()
+    (init (get-result)))
 
   (defun ||:integer (a:integer b:integer c:integer)
     (| (shift a 512) (| (shift b 256) c)))
@@ -22,30 +40,2313 @@
       {'a:b, 'b:c, 'c:(do-digest a b c)})
   )
 
-  (defun mc-round:integer (seed:integer _:integer)
-    (at 'c (fold (mc-iteration) {'a:seed, 'b:seed, 'c:seed} (enumerate 1 1000)))
-  )
-
-  (defun mc-test:integer (to-checkpoint:integer seed:integer)
-    (fold (mc-round) seed (enumerate 0 to-checkpoint))
+  (defun iterate:string (count:integer)
+    (update it-table ""
+            (fold (mc-iteration) (read it-table "") (enumerate 1 count)))
   )
 )
+(create-table it-table)
+(commit-tx)
 
-; First we test Checkpoint 0
-(expect "Checkpoint 0 " (str-to-int 16 "d209f941bd2cae959edd33eb83fe81d7bddfbcc687bcb65f3855ce3738b2f45b")
-                        (mc-test 0 (str-to-int 16 "7d9959cf7db4fa58daf18a1696193dbea425b8acfa01c8cce79154baa7f29028")))
+(begin-tx)(sha-256-mc-test.init (str-to-int 16 "7d9959cf7db4fa58daf18a1696193dbea425b8acfa01c8cce79154baa7f29028"))(commit-tx)
 
-(print "Checkpoint 0 passed")
-
-
-; Then Checkpoint 9
-(expect "Checkpoint 9 " (str-to-int 16 "1a456f529e47978e7258e8d59ec44c3dd54e92b7bed3d7b905901139806a57f6")
-                        (mc-test 9 (str-to-int 16 "7d9959cf7db4fa58daf18a1696193dbea425b8acfa01c8cce79154baa7f29028")))
-
-(print "Checkpoint 9 passed")
-
-; End to checkpoint 99
-;(expect "Checkpoint 99 " (str-to-int "91370c8e23ca9d4b724fe1a5c0a13e2cedb7949f04e625441bf868259894727f")
-;                        (mc-test 99 (str-to-int 16 "7d9959cf7db4fa58daf18a1696193dbea425b8acfa01c8cce79154baa7f29028")))
-;
-;(print "Checkpoint 99 passed")
+(begin-tx)(sha-256-mc-test.re-seed)(commit-tx)
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 0 - 49
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 50 - 99
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 100 - 149
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 150 - 199
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 200 - 249
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 250 - 299
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 300 - 349
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 350 - 399
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 400 - 449
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 450 - 499
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 500 - 549
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 550 - 599
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 600 - 649
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 650 - 699
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 700 - 749
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 750 - 799
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 800 - 849
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 850 - 899
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 900 - 949
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 950 - 999
+(expect "CP: Checkpoint 0" (str-to-int 16 "d209f941bd2cae959edd33eb83fe81d7bddfbcc687bcb65f3855ce3738b2f45b") (sha-256-mc-test.get-result))
+(print "CP: Checkpoint 0 passed")
+(begin-tx)(sha-256-mc-test.re-seed)(commit-tx)
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 0 - 49
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 50 - 99
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 100 - 149
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 150 - 199
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 200 - 249
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 250 - 299
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 300 - 349
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 350 - 399
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 400 - 449
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 450 - 499
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 500 - 549
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 550 - 599
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 600 - 649
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 650 - 699
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 700 - 749
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 750 - 799
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 800 - 849
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 850 - 899
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 900 - 949
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 950 - 999
+(expect "CP: Checkpoint 1" (str-to-int 16 "e0df1036e4fa3663ade323b3c5e77715eae321bbe6c3abc12a46898d972a127b") (sha-256-mc-test.get-result))
+(print "CP: Checkpoint 1 passed")
+(begin-tx)(sha-256-mc-test.re-seed)(commit-tx)
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 0 - 49
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 50 - 99
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 100 - 149
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 150 - 199
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 200 - 249
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 250 - 299
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 300 - 349
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 350 - 399
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 400 - 449
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 450 - 499
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 500 - 549
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 550 - 599
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 600 - 649
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 650 - 699
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 700 - 749
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 750 - 799
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 800 - 849
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 850 - 899
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 900 - 949
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 950 - 999
+(expect "CP: Checkpoint 2" (str-to-int 16 "34a6fc2b0951a2c1e629a0aefe56066991f8876a0b8cd55fb75932e28e827746") (sha-256-mc-test.get-result))
+(print "CP: Checkpoint 2 passed")
+(begin-tx)(sha-256-mc-test.re-seed)(commit-tx)
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 0 - 49
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 50 - 99
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 100 - 149
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 150 - 199
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 200 - 249
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 250 - 299
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 300 - 349
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 350 - 399
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 400 - 449
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 450 - 499
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 500 - 549
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 550 - 599
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 600 - 649
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 650 - 699
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 700 - 749
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 750 - 799
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 800 - 849
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 850 - 899
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 900 - 949
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 950 - 999
+(expect "CP: Checkpoint 3" (str-to-int 16 "7ee648bb66e0eeb42bec0819ae2e09ab2ec1a794a74aa6f9966d0afca74bf769") (sha-256-mc-test.get-result))
+(print "CP: Checkpoint 3 passed")
+(begin-tx)(sha-256-mc-test.re-seed)(commit-tx)
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 0 - 49
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 50 - 99
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 100 - 149
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 150 - 199
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 200 - 249
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 250 - 299
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 300 - 349
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 350 - 399
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 400 - 449
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 450 - 499
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 500 - 549
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 550 - 599
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 600 - 649
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 650 - 699
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 700 - 749
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 750 - 799
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 800 - 849
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 850 - 899
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 900 - 949
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 950 - 999
+(expect "CP: Checkpoint 4" (str-to-int 16 "4762578953e070265ba9cc2c93a6986c6bfd72a6cb92204800dbb1668884914f") (sha-256-mc-test.get-result))
+(print "CP: Checkpoint 4 passed")
+(begin-tx)(sha-256-mc-test.re-seed)(commit-tx)
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 0 - 49
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 50 - 99
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 100 - 149
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 150 - 199
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 200 - 249
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 250 - 299
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 300 - 349
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 350 - 399
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 400 - 449
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 450 - 499
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 500 - 549
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 550 - 599
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 600 - 649
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 650 - 699
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 700 - 749
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 750 - 799
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 800 - 849
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 850 - 899
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 900 - 949
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 950 - 999
+(expect "CP: Checkpoint 5" (str-to-int 16 "e1ec133526d6408e3ea74a1960f4f1225f0a9d68945854ddaf358e7f46b1152c") (sha-256-mc-test.get-result))
+(print "CP: Checkpoint 5 passed")
+(begin-tx)(sha-256-mc-test.re-seed)(commit-tx)
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 0 - 49
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 50 - 99
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 100 - 149
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 150 - 199
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 200 - 249
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 250 - 299
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 300 - 349
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 350 - 399
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 400 - 449
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 450 - 499
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 500 - 549
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 550 - 599
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 600 - 649
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 650 - 699
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 700 - 749
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 750 - 799
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 800 - 849
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 850 - 899
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 900 - 949
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 950 - 999
+(expect "CP: Checkpoint 6" (str-to-int 16 "0347c9d1e39f74bdc7f5888e73c8b4a301e3cb36e5fc6ade61ebc50631a1c678") (sha-256-mc-test.get-result))
+(print "CP: Checkpoint 6 passed")
+(begin-tx)(sha-256-mc-test.re-seed)(commit-tx)
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 0 - 49
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 50 - 99
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 100 - 149
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 150 - 199
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 200 - 249
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 250 - 299
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 300 - 349
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 350 - 399
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 400 - 449
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 450 - 499
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 500 - 549
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 550 - 599
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 600 - 649
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 650 - 699
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 700 - 749
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 750 - 799
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 800 - 849
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 850 - 899
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 900 - 949
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 950 - 999
+(expect "CP: Checkpoint 7" (str-to-int 16 "62300d2f98dfae200d750aae7ba5006ee525c013ebf5f7f5119abb33058ff93e") (sha-256-mc-test.get-result))
+(print "CP: Checkpoint 7 passed")
+(begin-tx)(sha-256-mc-test.re-seed)(commit-tx)
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 0 - 49
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 50 - 99
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 100 - 149
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 150 - 199
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 200 - 249
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 250 - 299
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 300 - 349
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 350 - 399
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 400 - 449
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 450 - 499
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 500 - 549
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 550 - 599
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 600 - 649
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 650 - 699
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 700 - 749
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 750 - 799
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 800 - 849
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 850 - 899
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 900 - 949
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 950 - 999
+(expect "CP: Checkpoint 8" (str-to-int 16 "f18dce543856027529b9fa946237cc5e185f07d136771330af6f0a51a641bf05") (sha-256-mc-test.get-result))
+(print "CP: Checkpoint 8 passed")
+(begin-tx)(sha-256-mc-test.re-seed)(commit-tx)
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 0 - 49
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 50 - 99
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 100 - 149
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 150 - 199
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 200 - 249
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 250 - 299
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 300 - 349
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 350 - 399
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 400 - 449
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 450 - 499
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 500 - 549
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 550 - 599
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 600 - 649
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 650 - 699
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 700 - 749
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 750 - 799
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 800 - 849
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 850 - 899
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 900 - 949
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 950 - 999
+(expect "CP: Checkpoint 9" (str-to-int 16 "1a456f529e47978e7258e8d59ec44c3dd54e92b7bed3d7b905901139806a57f6") (sha-256-mc-test.get-result))
+(print "CP: Checkpoint 9 passed")
+(begin-tx)(sha-256-mc-test.re-seed)(commit-tx)
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 0 - 49
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 50 - 99
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 100 - 149
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 150 - 199
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 200 - 249
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 250 - 299
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 300 - 349
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 350 - 399
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 400 - 449
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 450 - 499
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 500 - 549
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 550 - 599
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 600 - 649
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 650 - 699
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 700 - 749
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 750 - 799
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 800 - 849
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 850 - 899
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 900 - 949
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 950 - 999
+(expect "CP: Checkpoint 10" (str-to-int 16 "f524645bbf86dd02b909d7281250b55fa8042c153f53f160ab1d03bb2a21206b") (sha-256-mc-test.get-result))
+(print "CP: Checkpoint 10 passed")
+(begin-tx)(sha-256-mc-test.re-seed)(commit-tx)
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 0 - 49
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 50 - 99
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 100 - 149
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 150 - 199
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 200 - 249
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 250 - 299
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 300 - 349
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 350 - 399
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 400 - 449
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 450 - 499
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 500 - 549
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 550 - 599
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 600 - 649
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 650 - 699
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 700 - 749
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 750 - 799
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 800 - 849
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 850 - 899
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 900 - 949
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 950 - 999
+(expect "CP: Checkpoint 11" (str-to-int 16 "28e6b42cb32a304cf496c9508f840d7e1b5ba697c15fec3dfb40756902c55262") (sha-256-mc-test.get-result))
+(print "CP: Checkpoint 11 passed")
+(begin-tx)(sha-256-mc-test.re-seed)(commit-tx)
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 0 - 49
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 50 - 99
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 100 - 149
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 150 - 199
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 200 - 249
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 250 - 299
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 300 - 349
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 350 - 399
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 400 - 449
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 450 - 499
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 500 - 549
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 550 - 599
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 600 - 649
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 650 - 699
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 700 - 749
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 750 - 799
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 800 - 849
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 850 - 899
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 900 - 949
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 950 - 999
+(expect "CP: Checkpoint 12" (str-to-int 16 "6744dc6fad4638a167eb2b42ab47e86e23bf251cfbc228d5e87f36724cd234bd") (sha-256-mc-test.get-result))
+(print "CP: Checkpoint 12 passed")
+(begin-tx)(sha-256-mc-test.re-seed)(commit-tx)
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 0 - 49
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 50 - 99
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 100 - 149
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 150 - 199
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 200 - 249
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 250 - 299
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 300 - 349
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 350 - 399
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 400 - 449
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 450 - 499
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 500 - 549
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 550 - 599
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 600 - 649
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 650 - 699
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 700 - 749
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 750 - 799
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 800 - 849
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 850 - 899
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 900 - 949
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 950 - 999
+(expect "CP: Checkpoint 13" (str-to-int 16 "7d90b8869ff96ef1c56eb2e4afd3a7d88ad9ad21692eace873f38ec85e52fe70") (sha-256-mc-test.get-result))
+(print "CP: Checkpoint 13 passed")
+(begin-tx)(sha-256-mc-test.re-seed)(commit-tx)
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 0 - 49
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 50 - 99
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 100 - 149
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 150 - 199
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 200 - 249
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 250 - 299
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 300 - 349
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 350 - 399
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 400 - 449
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 450 - 499
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 500 - 549
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 550 - 599
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 600 - 649
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 650 - 699
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 700 - 749
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 750 - 799
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 800 - 849
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 850 - 899
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 900 - 949
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 950 - 999
+(expect "CP: Checkpoint 14" (str-to-int 16 "2232fd5bc31f1d0b2b57c43c0400b1624e980ef9b61db7fb971bb1e053874c1f") (sha-256-mc-test.get-result))
+(print "CP: Checkpoint 14 passed")
+(begin-tx)(sha-256-mc-test.re-seed)(commit-tx)
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 0 - 49
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 50 - 99
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 100 - 149
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 150 - 199
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 200 - 249
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 250 - 299
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 300 - 349
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 350 - 399
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 400 - 449
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 450 - 499
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 500 - 549
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 550 - 599
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 600 - 649
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 650 - 699
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 700 - 749
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 750 - 799
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 800 - 849
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 850 - 899
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 900 - 949
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 950 - 999
+(expect "CP: Checkpoint 15" (str-to-int 16 "3106a291d89738de2882f2ee477046e0f5a9ddda0be762564c4fdc65a3cf80dd") (sha-256-mc-test.get-result))
+(print "CP: Checkpoint 15 passed")
+(begin-tx)(sha-256-mc-test.re-seed)(commit-tx)
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 0 - 49
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 50 - 99
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 100 - 149
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 150 - 199
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 200 - 249
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 250 - 299
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 300 - 349
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 350 - 399
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 400 - 449
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 450 - 499
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 500 - 549
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 550 - 599
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 600 - 649
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 650 - 699
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 700 - 749
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 750 - 799
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 800 - 849
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 850 - 899
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 900 - 949
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 950 - 999
+(expect "CP: Checkpoint 16" (str-to-int 16 "bc83a1bb2648e1999d64c888d66c94801dee991777b0517ef0512953d7bc5ad2") (sha-256-mc-test.get-result))
+(print "CP: Checkpoint 16 passed")
+(begin-tx)(sha-256-mc-test.re-seed)(commit-tx)
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 0 - 49
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 50 - 99
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 100 - 149
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 150 - 199
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 200 - 249
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 250 - 299
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 300 - 349
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 350 - 399
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 400 - 449
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 450 - 499
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 500 - 549
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 550 - 599
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 600 - 649
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 650 - 699
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 700 - 749
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 750 - 799
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 800 - 849
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 850 - 899
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 900 - 949
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 950 - 999
+(expect "CP: Checkpoint 17" (str-to-int 16 "bb88c191b94deca0671c6d10951bad183365552ea2c66f26772dfa4eb9bffeca") (sha-256-mc-test.get-result))
+(print "CP: Checkpoint 17 passed")
+(begin-tx)(sha-256-mc-test.re-seed)(commit-tx)
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 0 - 49
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 50 - 99
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 100 - 149
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 150 - 199
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 200 - 249
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 250 - 299
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 300 - 349
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 350 - 399
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 400 - 449
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 450 - 499
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 500 - 549
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 550 - 599
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 600 - 649
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 650 - 699
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 700 - 749
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 750 - 799
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 800 - 849
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 850 - 899
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 900 - 949
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 950 - 999
+(expect "CP: Checkpoint 18" (str-to-int 16 "6dbd48d1b80b451a75e44170e1debb75f5bbb6b19c612950f4a05abdde58518d") (sha-256-mc-test.get-result))
+(print "CP: Checkpoint 18 passed")
+(begin-tx)(sha-256-mc-test.re-seed)(commit-tx)
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 0 - 49
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 50 - 99
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 100 - 149
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 150 - 199
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 200 - 249
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 250 - 299
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 300 - 349
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 350 - 399
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 400 - 449
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 450 - 499
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 500 - 549
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 550 - 599
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 600 - 649
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 650 - 699
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 700 - 749
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 750 - 799
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 800 - 849
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 850 - 899
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 900 - 949
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 950 - 999
+(expect "CP: Checkpoint 19" (str-to-int 16 "820949a3b3c03255f5c4677e9644125f42d69a82cee8f19acee18eb19adb0fe4") (sha-256-mc-test.get-result))
+(print "CP: Checkpoint 19 passed")
+(begin-tx)(sha-256-mc-test.re-seed)(commit-tx)
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 0 - 49
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 50 - 99
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 100 - 149
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 150 - 199
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 200 - 249
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 250 - 299
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 300 - 349
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 350 - 399
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 400 - 449
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 450 - 499
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 500 - 549
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 550 - 599
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 600 - 649
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 650 - 699
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 700 - 749
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 750 - 799
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 800 - 849
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 850 - 899
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 900 - 949
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 950 - 999
+(expect "CP: Checkpoint 20" (str-to-int 16 "4bec90bb77961c1e53efb3a161a14f6cf8f2e2967527808e66861f14af0677d2") (sha-256-mc-test.get-result))
+(print "CP: Checkpoint 20 passed")
+(begin-tx)(sha-256-mc-test.re-seed)(commit-tx)
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 0 - 49
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 50 - 99
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 100 - 149
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 150 - 199
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 200 - 249
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 250 - 299
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 300 - 349
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 350 - 399
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 400 - 449
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 450 - 499
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 500 - 549
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 550 - 599
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 600 - 649
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 650 - 699
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 700 - 749
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 750 - 799
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 800 - 849
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 850 - 899
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 900 - 949
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 950 - 999
+(expect "CP: Checkpoint 21" (str-to-int 16 "6dc0cbf7273f329530c3f9e64caad72ee22af9fa12d61f4600af312577a2c3c3") (sha-256-mc-test.get-result))
+(print "CP: Checkpoint 21 passed")
+(begin-tx)(sha-256-mc-test.re-seed)(commit-tx)
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 0 - 49
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 50 - 99
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 100 - 149
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 150 - 199
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 200 - 249
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 250 - 299
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 300 - 349
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 350 - 399
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 400 - 449
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 450 - 499
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 500 - 549
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 550 - 599
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 600 - 649
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 650 - 699
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 700 - 749
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 750 - 799
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 800 - 849
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 850 - 899
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 900 - 949
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 950 - 999
+(expect "CP: Checkpoint 22" (str-to-int 16 "cf91c6fb4c5249f7822fb5b0201c268822931e0bad49ef1d245d7b93810acdc3") (sha-256-mc-test.get-result))
+(print "CP: Checkpoint 22 passed")
+(begin-tx)(sha-256-mc-test.re-seed)(commit-tx)
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 0 - 49
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 50 - 99
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 100 - 149
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 150 - 199
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 200 - 249
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 250 - 299
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 300 - 349
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 350 - 399
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 400 - 449
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 450 - 499
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 500 - 549
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 550 - 599
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 600 - 649
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 650 - 699
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 700 - 749
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 750 - 799
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 800 - 849
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 850 - 899
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 900 - 949
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 950 - 999
+(expect "CP: Checkpoint 23" (str-to-int 16 "0f82dc17f4c394d24b4a42efabd62fe83af6693cb53cc91bfc6768825bb97bba") (sha-256-mc-test.get-result))
+(print "CP: Checkpoint 23 passed")
+(begin-tx)(sha-256-mc-test.re-seed)(commit-tx)
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 0 - 49
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 50 - 99
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 100 - 149
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 150 - 199
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 200 - 249
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 250 - 299
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 300 - 349
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 350 - 399
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 400 - 449
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 450 - 499
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 500 - 549
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 550 - 599
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 600 - 649
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 650 - 699
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 700 - 749
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 750 - 799
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 800 - 849
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 850 - 899
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 900 - 949
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 950 - 999
+(expect "CP: Checkpoint 24" (str-to-int 16 "0c0c9760f3d5e080eac2c923900fc5cc8cf5532ea45844c6e4c5c39419f2c53c") (sha-256-mc-test.get-result))
+(print "CP: Checkpoint 24 passed")
+(begin-tx)(sha-256-mc-test.re-seed)(commit-tx)
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 0 - 49
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 50 - 99
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 100 - 149
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 150 - 199
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 200 - 249
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 250 - 299
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 300 - 349
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 350 - 399
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 400 - 449
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 450 - 499
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 500 - 549
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 550 - 599
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 600 - 649
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 650 - 699
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 700 - 749
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 750 - 799
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 800 - 849
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 850 - 899
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 900 - 949
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 950 - 999
+(expect "CP: Checkpoint 25" (str-to-int 16 "451fd33c42d9260f6be4c85b90069daeb054ae842fea6f6f3c81fc9ef87f74d4") (sha-256-mc-test.get-result))
+(print "CP: Checkpoint 25 passed")
+(begin-tx)(sha-256-mc-test.re-seed)(commit-tx)
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 0 - 49
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 50 - 99
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 100 - 149
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 150 - 199
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 200 - 249
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 250 - 299
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 300 - 349
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 350 - 399
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 400 - 449
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 450 - 499
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 500 - 549
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 550 - 599
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 600 - 649
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 650 - 699
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 700 - 749
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 750 - 799
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 800 - 849
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 850 - 899
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 900 - 949
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 950 - 999
+(expect "CP: Checkpoint 26" (str-to-int 16 "d5144efbf10185a0ebd11caa1e5389f00c28433f8f3a540d5ad429d8891aa47f") (sha-256-mc-test.get-result))
+(print "CP: Checkpoint 26 passed")
+(begin-tx)(sha-256-mc-test.re-seed)(commit-tx)
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 0 - 49
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 50 - 99
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 100 - 149
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 150 - 199
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 200 - 249
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 250 - 299
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 300 - 349
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 350 - 399
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 400 - 449
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 450 - 499
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 500 - 549
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 550 - 599
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 600 - 649
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 650 - 699
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 700 - 749
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 750 - 799
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 800 - 849
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 850 - 899
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 900 - 949
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 950 - 999
+(expect "CP: Checkpoint 27" (str-to-int 16 "b1c1204460406e4897b65280f8e5c8003df80cc1903ca5c3e486b61375e1e7a8") (sha-256-mc-test.get-result))
+(print "CP: Checkpoint 27 passed")
+(begin-tx)(sha-256-mc-test.re-seed)(commit-tx)
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 0 - 49
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 50 - 99
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 100 - 149
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 150 - 199
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 200 - 249
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 250 - 299
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 300 - 349
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 350 - 399
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 400 - 449
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 450 - 499
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 500 - 549
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 550 - 599
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 600 - 649
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 650 - 699
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 700 - 749
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 750 - 799
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 800 - 849
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 850 - 899
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 900 - 949
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 950 - 999
+(expect "CP: Checkpoint 28" (str-to-int 16 "e5444489100988f836c821326cd80838433eb6f7bbfcd52b42f93820147fedb1") (sha-256-mc-test.get-result))
+(print "CP: Checkpoint 28 passed")
+(begin-tx)(sha-256-mc-test.re-seed)(commit-tx)
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 0 - 49
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 50 - 99
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 100 - 149
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 150 - 199
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 200 - 249
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 250 - 299
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 300 - 349
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 350 - 399
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 400 - 449
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 450 - 499
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 500 - 549
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 550 - 599
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 600 - 649
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 650 - 699
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 700 - 749
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 750 - 799
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 800 - 849
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 850 - 899
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 900 - 949
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 950 - 999
+(expect "CP: Checkpoint 29" (str-to-int 16 "4e35aeb8cd6390dd58e9819ba2bc46be7c9fca18acb53b03b77f9cae05bb2ab8") (sha-256-mc-test.get-result))
+(print "CP: Checkpoint 29 passed")
+(begin-tx)(sha-256-mc-test.re-seed)(commit-tx)
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 0 - 49
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 50 - 99
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 100 - 149
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 150 - 199
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 200 - 249
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 250 - 299
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 300 - 349
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 350 - 399
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 400 - 449
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 450 - 499
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 500 - 549
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 550 - 599
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 600 - 649
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 650 - 699
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 700 - 749
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 750 - 799
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 800 - 849
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 850 - 899
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 900 - 949
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 950 - 999
+(expect "CP: Checkpoint 30" (str-to-int 16 "d7bc378fc69b6e8cb75e80aec47695fb4f8119e694044676642b69eef8063ad7") (sha-256-mc-test.get-result))
+(print "CP: Checkpoint 30 passed")
+(begin-tx)(sha-256-mc-test.re-seed)(commit-tx)
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 0 - 49
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 50 - 99
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 100 - 149
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 150 - 199
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 200 - 249
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 250 - 299
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 300 - 349
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 350 - 399
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 400 - 449
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 450 - 499
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 500 - 549
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 550 - 599
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 600 - 649
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 650 - 699
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 700 - 749
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 750 - 799
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 800 - 849
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 850 - 899
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 900 - 949
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 950 - 999
+(expect "CP: Checkpoint 31" (str-to-int 16 "8335a7c4693ead072bc9f1877827ba75f77b041cb37c8a0cce1dbb6dc27f33d3") (sha-256-mc-test.get-result))
+(print "CP: Checkpoint 31 passed")
+(begin-tx)(sha-256-mc-test.re-seed)(commit-tx)
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 0 - 49
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 50 - 99
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 100 - 149
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 150 - 199
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 200 - 249
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 250 - 299
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 300 - 349
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 350 - 399
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 400 - 449
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 450 - 499
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 500 - 549
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 550 - 599
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 600 - 649
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 650 - 699
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 700 - 749
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 750 - 799
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 800 - 849
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 850 - 899
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 900 - 949
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 950 - 999
+(expect "CP: Checkpoint 32" (str-to-int 16 "6ae69908d24c21a84a5e52184b6ec656ea28835aea9ee0683fd57150c70afdf4") (sha-256-mc-test.get-result))
+(print "CP: Checkpoint 32 passed")
+(begin-tx)(sha-256-mc-test.re-seed)(commit-tx)
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 0 - 49
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 50 - 99
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 100 - 149
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 150 - 199
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 200 - 249
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 250 - 299
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 300 - 349
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 350 - 399
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 400 - 449
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 450 - 499
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 500 - 549
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 550 - 599
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 600 - 649
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 650 - 699
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 700 - 749
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 750 - 799
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 800 - 849
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 850 - 899
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 900 - 949
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 950 - 999
+(expect "CP: Checkpoint 33" (str-to-int 16 "8a2db8334421f21ee752a8693a2ccc4fa5f1f6251eb9b68bca32085a456811cf") (sha-256-mc-test.get-result))
+(print "CP: Checkpoint 33 passed")
+(begin-tx)(sha-256-mc-test.re-seed)(commit-tx)
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 0 - 49
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 50 - 99
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 100 - 149
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 150 - 199
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 200 - 249
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 250 - 299
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 300 - 349
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 350 - 399
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 400 - 449
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 450 - 499
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 500 - 549
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 550 - 599
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 600 - 649
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 650 - 699
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 700 - 749
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 750 - 799
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 800 - 849
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 850 - 899
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 900 - 949
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 950 - 999
+(expect "CP: Checkpoint 34" (str-to-int 16 "20a6d825760a7c0fb7cb3b1c859a1dfd58751db2160d0d18f1321276f6b48b52") (sha-256-mc-test.get-result))
+(print "CP: Checkpoint 34 passed")
+(begin-tx)(sha-256-mc-test.re-seed)(commit-tx)
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 0 - 49
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 50 - 99
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 100 - 149
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 150 - 199
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 200 - 249
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 250 - 299
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 300 - 349
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 350 - 399
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 400 - 449
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 450 - 499
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 500 - 549
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 550 - 599
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 600 - 649
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 650 - 699
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 700 - 749
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 750 - 799
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 800 - 849
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 850 - 899
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 900 - 949
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 950 - 999
+(expect "CP: Checkpoint 35" (str-to-int 16 "615fde979a454328fcd5ec6299ac2fd6e655b87bb2780363dd1fc8977322cbee") (sha-256-mc-test.get-result))
+(print "CP: Checkpoint 35 passed")
+(begin-tx)(sha-256-mc-test.re-seed)(commit-tx)
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 0 - 49
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 50 - 99
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 100 - 149
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 150 - 199
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 200 - 249
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 250 - 299
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 300 - 349
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 350 - 399
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 400 - 449
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 450 - 499
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 500 - 549
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 550 - 599
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 600 - 649
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 650 - 699
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 700 - 749
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 750 - 799
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 800 - 849
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 850 - 899
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 900 - 949
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 950 - 999
+(expect "CP: Checkpoint 36" (str-to-int 16 "d93980c9a8b62fe92e02d85385f372c24ed758755606ef844fba2333e7a3e808") (sha-256-mc-test.get-result))
+(print "CP: Checkpoint 36 passed")
+(begin-tx)(sha-256-mc-test.re-seed)(commit-tx)
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 0 - 49
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 50 - 99
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 100 - 149
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 150 - 199
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 200 - 249
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 250 - 299
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 300 - 349
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 350 - 399
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 400 - 449
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 450 - 499
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 500 - 549
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 550 - 599
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 600 - 649
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 650 - 699
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 700 - 749
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 750 - 799
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 800 - 849
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 850 - 899
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 900 - 949
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 950 - 999
+(expect "CP: Checkpoint 37" (str-to-int 16 "469189dd0aa9bd35a3642241f7812717f0ddf2c71364087742d6f681c073e9fa") (sha-256-mc-test.get-result))
+(print "CP: Checkpoint 37 passed")
+(begin-tx)(sha-256-mc-test.re-seed)(commit-tx)
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 0 - 49
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 50 - 99
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 100 - 149
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 150 - 199
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 200 - 249
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 250 - 299
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 300 - 349
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 350 - 399
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 400 - 449
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 450 - 499
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 500 - 549
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 550 - 599
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 600 - 649
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 650 - 699
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 700 - 749
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 750 - 799
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 800 - 849
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 850 - 899
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 900 - 949
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 950 - 999
+(expect "CP: Checkpoint 38" (str-to-int 16 "84b6437387db4a837e72d4f34be8ebad845bfa479126fee1f554c415fd153dac") (sha-256-mc-test.get-result))
+(print "CP: Checkpoint 38 passed")
+(begin-tx)(sha-256-mc-test.re-seed)(commit-tx)
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 0 - 49
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 50 - 99
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 100 - 149
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 150 - 199
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 200 - 249
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 250 - 299
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 300 - 349
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 350 - 399
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 400 - 449
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 450 - 499
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 500 - 549
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 550 - 599
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 600 - 649
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 650 - 699
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 700 - 749
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 750 - 799
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 800 - 849
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 850 - 899
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 900 - 949
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 950 - 999
+(expect "CP: Checkpoint 39" (str-to-int 16 "f61288f099ca52465efd028b0ff2b1b921adec3b61b7ebc96043e4fd46f70ed8") (sha-256-mc-test.get-result))
+(print "CP: Checkpoint 39 passed")
+(begin-tx)(sha-256-mc-test.re-seed)(commit-tx)
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 0 - 49
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 50 - 99
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 100 - 149
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 150 - 199
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 200 - 249
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 250 - 299
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 300 - 349
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 350 - 399
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 400 - 449
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 450 - 499
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 500 - 549
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 550 - 599
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 600 - 649
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 650 - 699
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 700 - 749
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 750 - 799
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 800 - 849
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 850 - 899
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 900 - 949
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 950 - 999
+(expect "CP: Checkpoint 40" (str-to-int 16 "ab2cdc0b947970ab20cfce47734e1b9a8f7c839ce79b9cbf02cf3077756ced3d") (sha-256-mc-test.get-result))
+(print "CP: Checkpoint 40 passed")
+(begin-tx)(sha-256-mc-test.re-seed)(commit-tx)
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 0 - 49
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 50 - 99
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 100 - 149
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 150 - 199
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 200 - 249
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 250 - 299
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 300 - 349
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 350 - 399
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 400 - 449
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 450 - 499
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 500 - 549
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 550 - 599
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 600 - 649
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 650 - 699
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 700 - 749
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 750 - 799
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 800 - 849
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 850 - 899
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 900 - 949
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 950 - 999
+(expect "CP: Checkpoint 41" (str-to-int 16 "5d1ee2c7d1cb12445bd9e93f7fbf540971d0101b7d730522f637b749227302cb") (sha-256-mc-test.get-result))
+(print "CP: Checkpoint 41 passed")
+(begin-tx)(sha-256-mc-test.re-seed)(commit-tx)
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 0 - 49
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 50 - 99
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 100 - 149
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 150 - 199
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 200 - 249
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 250 - 299
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 300 - 349
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 350 - 399
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 400 - 449
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 450 - 499
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 500 - 549
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 550 - 599
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 600 - 649
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 650 - 699
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 700 - 749
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 750 - 799
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 800 - 849
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 850 - 899
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 900 - 949
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 950 - 999
+(expect "CP: Checkpoint 42" (str-to-int 16 "db328d78ecf0ba48dc6395b57b976d3e6993aa64fc58e702f32fef1a96640d12") (sha-256-mc-test.get-result))
+(print "CP: Checkpoint 42 passed")
+(begin-tx)(sha-256-mc-test.re-seed)(commit-tx)
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 0 - 49
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 50 - 99
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 100 - 149
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 150 - 199
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 200 - 249
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 250 - 299
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 300 - 349
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 350 - 399
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 400 - 449
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 450 - 499
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 500 - 549
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 550 - 599
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 600 - 649
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 650 - 699
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 700 - 749
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 750 - 799
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 800 - 849
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 850 - 899
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 900 - 949
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 950 - 999
+(expect "CP: Checkpoint 43" (str-to-int 16 "a3e9fdde291cad17b9742375037fe3963499a096c3bb8850959ae3767d1bd0d3") (sha-256-mc-test.get-result))
+(print "CP: Checkpoint 43 passed")
+(begin-tx)(sha-256-mc-test.re-seed)(commit-tx)
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 0 - 49
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 50 - 99
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 100 - 149
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 150 - 199
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 200 - 249
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 250 - 299
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 300 - 349
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 350 - 399
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 400 - 449
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 450 - 499
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 500 - 549
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 550 - 599
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 600 - 649
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 650 - 699
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 700 - 749
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 750 - 799
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 800 - 849
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 850 - 899
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 900 - 949
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 950 - 999
+(expect "CP: Checkpoint 44" (str-to-int 16 "9fdbcd8b1fcac9c88f85db9576959f293d20a059700a04a81351545fdffc8dfb") (sha-256-mc-test.get-result))
+(print "CP: Checkpoint 44 passed")
+(begin-tx)(sha-256-mc-test.re-seed)(commit-tx)
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 0 - 49
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 50 - 99
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 100 - 149
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 150 - 199
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 200 - 249
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 250 - 299
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 300 - 349
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 350 - 399
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 400 - 449
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 450 - 499
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 500 - 549
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 550 - 599
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 600 - 649
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 650 - 699
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 700 - 749
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 750 - 799
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 800 - 849
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 850 - 899
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 900 - 949
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 950 - 999
+(expect "CP: Checkpoint 45" (str-to-int 16 "19e1aed3d8c92fcc5ee3905475edd7eaa8eb7e04fece930c98437b777164bf01") (sha-256-mc-test.get-result))
+(print "CP: Checkpoint 45 passed")
+(begin-tx)(sha-256-mc-test.re-seed)(commit-tx)
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 0 - 49
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 50 - 99
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 100 - 149
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 150 - 199
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 200 - 249
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 250 - 299
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 300 - 349
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 350 - 399
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 400 - 449
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 450 - 499
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 500 - 549
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 550 - 599
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 600 - 649
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 650 - 699
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 700 - 749
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 750 - 799
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 800 - 849
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 850 - 899
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 900 - 949
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 950 - 999
+(expect "CP: Checkpoint 46" (str-to-int 16 "4f2b7cc107846b3ade6600475697100a3bfb9a3ec4b4b69bc1a31ce2bf3350dc") (sha-256-mc-test.get-result))
+(print "CP: Checkpoint 46 passed")
+(begin-tx)(sha-256-mc-test.re-seed)(commit-tx)
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 0 - 49
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 50 - 99
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 100 - 149
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 150 - 199
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 200 - 249
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 250 - 299
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 300 - 349
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 350 - 399
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 400 - 449
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 450 - 499
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 500 - 549
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 550 - 599
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 600 - 649
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 650 - 699
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 700 - 749
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 750 - 799
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 800 - 849
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 850 - 899
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 900 - 949
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 950 - 999
+(expect "CP: Checkpoint 47" (str-to-int 16 "d0ed9893fb13205dbcc4e52b60e11853627263cd2520cbf4983ad38bc6498c93") (sha-256-mc-test.get-result))
+(print "CP: Checkpoint 47 passed")
+(begin-tx)(sha-256-mc-test.re-seed)(commit-tx)
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 0 - 49
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 50 - 99
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 100 - 149
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 150 - 199
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 200 - 249
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 250 - 299
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 300 - 349
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 350 - 399
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 400 - 449
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 450 - 499
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 500 - 549
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 550 - 599
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 600 - 649
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 650 - 699
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 700 - 749
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 750 - 799
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 800 - 849
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 850 - 899
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 900 - 949
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 950 - 999
+(expect "CP: Checkpoint 48" (str-to-int 16 "1f9adb16ed68fa7790675bb327f3545ca3484d90b117abdec1f6d187aabc79f8") (sha-256-mc-test.get-result))
+(print "CP: Checkpoint 48 passed")
+(begin-tx)(sha-256-mc-test.re-seed)(commit-tx)
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 0 - 49
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 50 - 99
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 100 - 149
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 150 - 199
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 200 - 249
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 250 - 299
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 300 - 349
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 350 - 399
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 400 - 449
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 450 - 499
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 500 - 549
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 550 - 599
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 600 - 649
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 650 - 699
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 700 - 749
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 750 - 799
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 800 - 849
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 850 - 899
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 900 - 949
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 950 - 999
+(expect "CP: Checkpoint 49" (str-to-int 16 "4288cef8a08d13e26824f61063db600a2de81b3be3e69414a874abafd0e2162b") (sha-256-mc-test.get-result))
+(print "CP: Checkpoint 49 passed")
+(begin-tx)(sha-256-mc-test.re-seed)(commit-tx)
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 0 - 49
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 50 - 99
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 100 - 149
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 150 - 199
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 200 - 249
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 250 - 299
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 300 - 349
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 350 - 399
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 400 - 449
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 450 - 499
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 500 - 549
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 550 - 599
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 600 - 649
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 650 - 699
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 700 - 749
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 750 - 799
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 800 - 849
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 850 - 899
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 900 - 949
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 950 - 999
+(expect "CP: Checkpoint 50" (str-to-int 16 "dac61cb452ad0eaffb5481a443ce4b9aa54a11ba1b7edc899b4d197dba278934") (sha-256-mc-test.get-result))
+(print "CP: Checkpoint 50 passed")
+(begin-tx)(sha-256-mc-test.re-seed)(commit-tx)
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 0 - 49
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 50 - 99
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 100 - 149
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 150 - 199
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 200 - 249
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 250 - 299
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 300 - 349
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 350 - 399
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 400 - 449
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 450 - 499
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 500 - 549
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 550 - 599
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 600 - 649
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 650 - 699
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 700 - 749
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 750 - 799
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 800 - 849
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 850 - 899
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 900 - 949
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 950 - 999
+(expect "CP: Checkpoint 51" (str-to-int 16 "71b8d006bab4687a407763eb00e2afa2b4cfcb97c50bb9b7940dc0d7ba0efb44") (sha-256-mc-test.get-result))
+(print "CP: Checkpoint 51 passed")
+(begin-tx)(sha-256-mc-test.re-seed)(commit-tx)
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 0 - 49
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 50 - 99
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 100 - 149
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 150 - 199
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 200 - 249
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 250 - 299
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 300 - 349
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 350 - 399
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 400 - 449
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 450 - 499
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 500 - 549
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 550 - 599
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 600 - 649
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 650 - 699
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 700 - 749
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 750 - 799
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 800 - 849
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 850 - 899
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 900 - 949
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 950 - 999
+(expect "CP: Checkpoint 52" (str-to-int 16 "c0ec4b0d2b73bc863b81c162ec2e612d1c58ad918ed66c39b552b0732cd199ce") (sha-256-mc-test.get-result))
+(print "CP: Checkpoint 52 passed")
+(begin-tx)(sha-256-mc-test.re-seed)(commit-tx)
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 0 - 49
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 50 - 99
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 100 - 149
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 150 - 199
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 200 - 249
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 250 - 299
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 300 - 349
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 350 - 399
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 400 - 449
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 450 - 499
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 500 - 549
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 550 - 599
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 600 - 649
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 650 - 699
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 700 - 749
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 750 - 799
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 800 - 849
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 850 - 899
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 900 - 949
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 950 - 999
+(expect "CP: Checkpoint 53" (str-to-int 16 "a005e683c98259050d59d12441a96895d190c7da743913e48717077984458108") (sha-256-mc-test.get-result))
+(print "CP: Checkpoint 53 passed")
+(begin-tx)(sha-256-mc-test.re-seed)(commit-tx)
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 0 - 49
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 50 - 99
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 100 - 149
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 150 - 199
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 200 - 249
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 250 - 299
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 300 - 349
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 350 - 399
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 400 - 449
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 450 - 499
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 500 - 549
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 550 - 599
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 600 - 649
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 650 - 699
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 700 - 749
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 750 - 799
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 800 - 849
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 850 - 899
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 900 - 949
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 950 - 999
+(expect "CP: Checkpoint 54" (str-to-int 16 "194d41aa74c18906fb3e18d225372fd1092efaa321bd38de2efe57cd34681e05") (sha-256-mc-test.get-result))
+(print "CP: Checkpoint 54 passed")
+(begin-tx)(sha-256-mc-test.re-seed)(commit-tx)
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 0 - 49
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 50 - 99
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 100 - 149
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 150 - 199
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 200 - 249
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 250 - 299
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 300 - 349
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 350 - 399
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 400 - 449
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 450 - 499
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 500 - 549
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 550 - 599
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 600 - 649
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 650 - 699
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 700 - 749
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 750 - 799
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 800 - 849
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 850 - 899
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 900 - 949
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 950 - 999
+(expect "CP: Checkpoint 55" (str-to-int 16 "18ca99b86cc22afa29d7a7fabb63fad8e5b8a8e2dc9af306e520fe91b687ecad") (sha-256-mc-test.get-result))
+(print "CP: Checkpoint 55 passed")
+(begin-tx)(sha-256-mc-test.re-seed)(commit-tx)
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 0 - 49
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 50 - 99
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 100 - 149
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 150 - 199
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 200 - 249
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 250 - 299
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 300 - 349
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 350 - 399
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 400 - 449
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 450 - 499
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 500 - 549
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 550 - 599
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 600 - 649
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 650 - 699
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 700 - 749
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 750 - 799
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 800 - 849
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 850 - 899
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 900 - 949
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 950 - 999
+(expect "CP: Checkpoint 56" (str-to-int 16 "a217572c26673006c9675f7b713b14582c0050a6219b7a9abe7a5e267a633f13") (sha-256-mc-test.get-result))
+(print "CP: Checkpoint 56 passed")
+(begin-tx)(sha-256-mc-test.re-seed)(commit-tx)
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 0 - 49
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 50 - 99
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 100 - 149
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 150 - 199
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 200 - 249
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 250 - 299
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 300 - 349
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 350 - 399
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 400 - 449
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 450 - 499
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 500 - 549
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 550 - 599
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 600 - 649
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 650 - 699
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 700 - 749
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 750 - 799
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 800 - 849
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 850 - 899
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 900 - 949
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 950 - 999
+(expect "CP: Checkpoint 57" (str-to-int 16 "b2882d135175795a75019560d94f707b9ebeee66af3574ff1d4d054dcab6b999") (sha-256-mc-test.get-result))
+(print "CP: Checkpoint 57 passed")
+(begin-tx)(sha-256-mc-test.re-seed)(commit-tx)
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 0 - 49
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 50 - 99
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 100 - 149
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 150 - 199
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 200 - 249
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 250 - 299
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 300 - 349
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 350 - 399
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 400 - 449
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 450 - 499
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 500 - 549
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 550 - 599
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 600 - 649
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 650 - 699
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 700 - 749
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 750 - 799
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 800 - 849
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 850 - 899
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 900 - 949
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 950 - 999
+(expect "CP: Checkpoint 58" (str-to-int 16 "5902ec669a840eca0953fb51518d1bc04ce91cb7b3c347222481990f2390ff85") (sha-256-mc-test.get-result))
+(print "CP: Checkpoint 58 passed")
+(begin-tx)(sha-256-mc-test.re-seed)(commit-tx)
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 0 - 49
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 50 - 99
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 100 - 149
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 150 - 199
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 200 - 249
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 250 - 299
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 300 - 349
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 350 - 399
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 400 - 449
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 450 - 499
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 500 - 549
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 550 - 599
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 600 - 649
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 650 - 699
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 700 - 749
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 750 - 799
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 800 - 849
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 850 - 899
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 900 - 949
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 950 - 999
+(expect "CP: Checkpoint 59" (str-to-int 16 "b6816fb139f4b746cc77603846659bd0ba4d46cbac0fe3c871a3e455dc626fb4") (sha-256-mc-test.get-result))
+(print "CP: Checkpoint 59 passed")
+(begin-tx)(sha-256-mc-test.re-seed)(commit-tx)
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 0 - 49
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 50 - 99
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 100 - 149
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 150 - 199
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 200 - 249
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 250 - 299
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 300 - 349
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 350 - 399
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 400 - 449
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 450 - 499
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 500 - 549
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 550 - 599
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 600 - 649
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 650 - 699
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 700 - 749
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 750 - 799
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 800 - 849
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 850 - 899
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 900 - 949
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 950 - 999
+(expect "CP: Checkpoint 60" (str-to-int 16 "348a89b1344231c67665d77a93a3409b0c259aa64beb4ed8b972cf2d7ce97825") (sha-256-mc-test.get-result))
+(print "CP: Checkpoint 60 passed")
+(begin-tx)(sha-256-mc-test.re-seed)(commit-tx)
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 0 - 49
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 50 - 99
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 100 - 149
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 150 - 199
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 200 - 249
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 250 - 299
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 300 - 349
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 350 - 399
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 400 - 449
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 450 - 499
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 500 - 549
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 550 - 599
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 600 - 649
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 650 - 699
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 700 - 749
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 750 - 799
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 800 - 849
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 850 - 899
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 900 - 949
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 950 - 999
+(expect "CP: Checkpoint 61" (str-to-int 16 "3ac4ebcf237fcc911daf756526725422ea58bd419eba25764606f7ee9bd92569") (sha-256-mc-test.get-result))
+(print "CP: Checkpoint 61 passed")
+(begin-tx)(sha-256-mc-test.re-seed)(commit-tx)
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 0 - 49
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 50 - 99
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 100 - 149
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 150 - 199
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 200 - 249
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 250 - 299
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 300 - 349
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 350 - 399
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 400 - 449
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 450 - 499
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 500 - 549
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 550 - 599
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 600 - 649
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 650 - 699
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 700 - 749
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 750 - 799
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 800 - 849
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 850 - 899
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 900 - 949
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 950 - 999
+(expect "CP: Checkpoint 62" (str-to-int 16 "ef7f7dca08e5ec23707f4dfb3f7f6b1f47ddb726236a161c313592a18b3ab315") (sha-256-mc-test.get-result))
+(print "CP: Checkpoint 62 passed")
+(begin-tx)(sha-256-mc-test.re-seed)(commit-tx)
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 0 - 49
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 50 - 99
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 100 - 149
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 150 - 199
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 200 - 249
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 250 - 299
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 300 - 349
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 350 - 399
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 400 - 449
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 450 - 499
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 500 - 549
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 550 - 599
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 600 - 649
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 650 - 699
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 700 - 749
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 750 - 799
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 800 - 849
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 850 - 899
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 900 - 949
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 950 - 999
+(expect "CP: Checkpoint 63" (str-to-int 16 "45d4ee6777cc19b5f3d01431b41e4e7718ecf482af39a160f9e24df71025b7b9") (sha-256-mc-test.get-result))
+(print "CP: Checkpoint 63 passed")
+(begin-tx)(sha-256-mc-test.re-seed)(commit-tx)
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 0 - 49
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 50 - 99
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 100 - 149
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 150 - 199
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 200 - 249
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 250 - 299
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 300 - 349
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 350 - 399
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 400 - 449
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 450 - 499
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 500 - 549
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 550 - 599
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 600 - 649
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 650 - 699
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 700 - 749
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 750 - 799
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 800 - 849
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 850 - 899
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 900 - 949
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 950 - 999
+(expect "CP: Checkpoint 64" (str-to-int 16 "a886091c6d552841a0ffea1eec5f63278ddf632d92d9b6c7880a19ce6b4cf02b") (sha-256-mc-test.get-result))
+(print "CP: Checkpoint 64 passed")
+(begin-tx)(sha-256-mc-test.re-seed)(commit-tx)
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 0 - 49
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 50 - 99
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 100 - 149
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 150 - 199
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 200 - 249
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 250 - 299
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 300 - 349
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 350 - 399
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 400 - 449
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 450 - 499
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 500 - 549
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 550 - 599
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 600 - 649
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 650 - 699
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 700 - 749
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 750 - 799
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 800 - 849
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 850 - 899
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 900 - 949
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 950 - 999
+(expect "CP: Checkpoint 65" (str-to-int 16 "1ab1994458aac4cca9a3db37256e87c33e794f30835854ed015ab37c68a711bc") (sha-256-mc-test.get-result))
+(print "CP: Checkpoint 65 passed")
+(begin-tx)(sha-256-mc-test.re-seed)(commit-tx)
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 0 - 49
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 50 - 99
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 100 - 149
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 150 - 199
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 200 - 249
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 250 - 299
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 300 - 349
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 350 - 399
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 400 - 449
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 450 - 499
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 500 - 549
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 550 - 599
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 600 - 649
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 650 - 699
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 700 - 749
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 750 - 799
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 800 - 849
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 850 - 899
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 900 - 949
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 950 - 999
+(expect "CP: Checkpoint 66" (str-to-int 16 "bab12fe47d8fb8eb49c756b661dfefd33adbb5ac954df84aa60e4e8388ddeb68") (sha-256-mc-test.get-result))
+(print "CP: Checkpoint 66 passed")
+(begin-tx)(sha-256-mc-test.re-seed)(commit-tx)
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 0 - 49
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 50 - 99
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 100 - 149
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 150 - 199
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 200 - 249
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 250 - 299
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 300 - 349
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 350 - 399
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 400 - 449
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 450 - 499
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 500 - 549
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 550 - 599
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 600 - 649
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 650 - 699
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 700 - 749
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 750 - 799
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 800 - 849
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 850 - 899
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 900 - 949
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 950 - 999
+(expect "CP: Checkpoint 67" (str-to-int 16 "b606f0cea810f00f701d0e9488a38408033dda53ffc10d62dc2e1d94a6156ba0") (sha-256-mc-test.get-result))
+(print "CP: Checkpoint 67 passed")
+(begin-tx)(sha-256-mc-test.re-seed)(commit-tx)
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 0 - 49
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 50 - 99
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 100 - 149
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 150 - 199
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 200 - 249
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 250 - 299
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 300 - 349
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 350 - 399
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 400 - 449
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 450 - 499
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 500 - 549
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 550 - 599
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 600 - 649
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 650 - 699
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 700 - 749
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 750 - 799
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 800 - 849
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 850 - 899
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 900 - 949
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 950 - 999
+(expect "CP: Checkpoint 68" (str-to-int 16 "7fa05c7152c216c3a8200185d0cb721e520b8b1a3110054518d643766a27f74a") (sha-256-mc-test.get-result))
+(print "CP: Checkpoint 68 passed")
+(begin-tx)(sha-256-mc-test.re-seed)(commit-tx)
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 0 - 49
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 50 - 99
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 100 - 149
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 150 - 199
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 200 - 249
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 250 - 299
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 300 - 349
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 350 - 399
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 400 - 449
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 450 - 499
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 500 - 549
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 550 - 599
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 600 - 649
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 650 - 699
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 700 - 749
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 750 - 799
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 800 - 849
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 850 - 899
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 900 - 949
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 950 - 999
+(expect "CP: Checkpoint 69" (str-to-int 16 "d7137bab74c6da620f3380fd4a3a6f74d49560104042c0fd0fffb99427a9ca50") (sha-256-mc-test.get-result))
+(print "CP: Checkpoint 69 passed")
+(begin-tx)(sha-256-mc-test.re-seed)(commit-tx)
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 0 - 49
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 50 - 99
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 100 - 149
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 150 - 199
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 200 - 249
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 250 - 299
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 300 - 349
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 350 - 399
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 400 - 449
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 450 - 499
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 500 - 549
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 550 - 599
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 600 - 649
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 650 - 699
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 700 - 749
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 750 - 799
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 800 - 849
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 850 - 899
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 900 - 949
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 950 - 999
+(expect "CP: Checkpoint 70" (str-to-int 16 "1745a594683628c8580925f2715486424f2ccd50b06a31be01e30a1349d74de9") (sha-256-mc-test.get-result))
+(print "CP: Checkpoint 70 passed")
+(begin-tx)(sha-256-mc-test.re-seed)(commit-tx)
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 0 - 49
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 50 - 99
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 100 - 149
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 150 - 199
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 200 - 249
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 250 - 299
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 300 - 349
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 350 - 399
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 400 - 449
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 450 - 499
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 500 - 549
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 550 - 599
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 600 - 649
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 650 - 699
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 700 - 749
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 750 - 799
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 800 - 849
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 850 - 899
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 900 - 949
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 950 - 999
+(expect "CP: Checkpoint 71" (str-to-int 16 "0b7c14a5da50e9831449979521fe2788d8f7c9f4288bc289a99248d07941a7d9") (sha-256-mc-test.get-result))
+(print "CP: Checkpoint 71 passed")
+(begin-tx)(sha-256-mc-test.re-seed)(commit-tx)
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 0 - 49
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 50 - 99
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 100 - 149
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 150 - 199
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 200 - 249
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 250 - 299
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 300 - 349
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 350 - 399
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 400 - 449
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 450 - 499
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 500 - 549
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 550 - 599
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 600 - 649
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 650 - 699
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 700 - 749
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 750 - 799
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 800 - 849
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 850 - 899
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 900 - 949
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 950 - 999
+(expect "CP: Checkpoint 72" (str-to-int 16 "4dc5a0a938132f51831d88c88e51c0161464f2d275f392f964b89c29a74af9f8") (sha-256-mc-test.get-result))
+(print "CP: Checkpoint 72 passed")
+(begin-tx)(sha-256-mc-test.re-seed)(commit-tx)
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 0 - 49
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 50 - 99
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 100 - 149
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 150 - 199
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 200 - 249
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 250 - 299
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 300 - 349
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 350 - 399
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 400 - 449
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 450 - 499
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 500 - 549
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 550 - 599
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 600 - 649
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 650 - 699
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 700 - 749
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 750 - 799
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 800 - 849
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 850 - 899
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 900 - 949
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 950 - 999
+(expect "CP: Checkpoint 73" (str-to-int 16 "56cf135a09f4652cdcc5600bdff01684e975ed2bdf2f97741a2063d33a9e61c8") (sha-256-mc-test.get-result))
+(print "CP: Checkpoint 73 passed")
+(begin-tx)(sha-256-mc-test.re-seed)(commit-tx)
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 0 - 49
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 50 - 99
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 100 - 149
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 150 - 199
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 200 - 249
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 250 - 299
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 300 - 349
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 350 - 399
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 400 - 449
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 450 - 499
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 500 - 549
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 550 - 599
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 600 - 649
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 650 - 699
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 700 - 749
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 750 - 799
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 800 - 849
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 850 - 899
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 900 - 949
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 950 - 999
+(expect "CP: Checkpoint 74" (str-to-int 16 "db679cb40331d2bbbc66109d457ae3c66854bbbcf33733739268d15568e3904b") (sha-256-mc-test.get-result))
+(print "CP: Checkpoint 74 passed")
+(begin-tx)(sha-256-mc-test.re-seed)(commit-tx)
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 0 - 49
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 50 - 99
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 100 - 149
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 150 - 199
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 200 - 249
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 250 - 299
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 300 - 349
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 350 - 399
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 400 - 449
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 450 - 499
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 500 - 549
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 550 - 599
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 600 - 649
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 650 - 699
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 700 - 749
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 750 - 799
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 800 - 849
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 850 - 899
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 900 - 949
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 950 - 999
+(expect "CP: Checkpoint 75" (str-to-int 16 "e20366e6443c5a85b324796fe8534fdf6040031ce368dd48ab9353904d2d980b") (sha-256-mc-test.get-result))
+(print "CP: Checkpoint 75 passed")
+(begin-tx)(sha-256-mc-test.re-seed)(commit-tx)
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 0 - 49
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 50 - 99
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 100 - 149
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 150 - 199
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 200 - 249
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 250 - 299
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 300 - 349
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 350 - 399
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 400 - 449
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 450 - 499
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 500 - 549
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 550 - 599
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 600 - 649
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 650 - 699
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 700 - 749
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 750 - 799
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 800 - 849
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 850 - 899
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 900 - 949
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 950 - 999
+(expect "CP: Checkpoint 76" (str-to-int 16 "a51018f12b3673008d21c046406d06536e8b534f5852ed4c9c0ec237cec63cc7") (sha-256-mc-test.get-result))
+(print "CP: Checkpoint 76 passed")
+(begin-tx)(sha-256-mc-test.re-seed)(commit-tx)
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 0 - 49
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 50 - 99
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 100 - 149
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 150 - 199
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 200 - 249
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 250 - 299
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 300 - 349
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 350 - 399
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 400 - 449
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 450 - 499
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 500 - 549
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 550 - 599
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 600 - 649
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 650 - 699
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 700 - 749
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 750 - 799
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 800 - 849
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 850 - 899
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 900 - 949
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 950 - 999
+(expect "CP: Checkpoint 77" (str-to-int 16 "e3091362e3bf6435a450381b57d13dc04498c8e56c2e256d67757fee29092606") (sha-256-mc-test.get-result))
+(print "CP: Checkpoint 77 passed")
+(begin-tx)(sha-256-mc-test.re-seed)(commit-tx)
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 0 - 49
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 50 - 99
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 100 - 149
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 150 - 199
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 200 - 249
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 250 - 299
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 300 - 349
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 350 - 399
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 400 - 449
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 450 - 499
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 500 - 549
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 550 - 599
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 600 - 649
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 650 - 699
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 700 - 749
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 750 - 799
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 800 - 849
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 850 - 899
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 900 - 949
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 950 - 999
+(expect "CP: Checkpoint 78" (str-to-int 16 "986fed6421b6550c29b6de74bec4844c64db484647694ffe713cade31f4e4e3c") (sha-256-mc-test.get-result))
+(print "CP: Checkpoint 78 passed")
+(begin-tx)(sha-256-mc-test.re-seed)(commit-tx)
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 0 - 49
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 50 - 99
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 100 - 149
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 150 - 199
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 200 - 249
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 250 - 299
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 300 - 349
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 350 - 399
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 400 - 449
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 450 - 499
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 500 - 549
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 550 - 599
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 600 - 649
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 650 - 699
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 700 - 749
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 750 - 799
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 800 - 849
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 850 - 899
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 900 - 949
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 950 - 999
+(expect "CP: Checkpoint 79" (str-to-int 16 "1f1d2b29cd36fff710309ef7f5a9248f27a57dbd6290b12355d151b8f76b76c7") (sha-256-mc-test.get-result))
+(print "CP: Checkpoint 79 passed")
+(begin-tx)(sha-256-mc-test.re-seed)(commit-tx)
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 0 - 49
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 50 - 99
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 100 - 149
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 150 - 199
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 200 - 249
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 250 - 299
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 300 - 349
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 350 - 399
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 400 - 449
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 450 - 499
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 500 - 549
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 550 - 599
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 600 - 649
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 650 - 699
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 700 - 749
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 750 - 799
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 800 - 849
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 850 - 899
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 900 - 949
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 950 - 999
+(expect "CP: Checkpoint 80" (str-to-int 16 "9b9b372b0a79c46f307a8591a8807a8c2a77a6647946069cb2b839069e3017c4") (sha-256-mc-test.get-result))
+(print "CP: Checkpoint 80 passed")
+(begin-tx)(sha-256-mc-test.re-seed)(commit-tx)
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 0 - 49
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 50 - 99
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 100 - 149
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 150 - 199
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 200 - 249
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 250 - 299
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 300 - 349
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 350 - 399
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 400 - 449
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 450 - 499
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 500 - 549
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 550 - 599
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 600 - 649
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 650 - 699
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 700 - 749
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 750 - 799
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 800 - 849
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 850 - 899
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 900 - 949
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 950 - 999
+(expect "CP: Checkpoint 81" (str-to-int 16 "6d89d5a44640c74c5d631308ffe5cbd47198fb48ad24f47cac3a5a8480209a96") (sha-256-mc-test.get-result))
+(print "CP: Checkpoint 81 passed")
+(begin-tx)(sha-256-mc-test.re-seed)(commit-tx)
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 0 - 49
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 50 - 99
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 100 - 149
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 150 - 199
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 200 - 249
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 250 - 299
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 300 - 349
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 350 - 399
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 400 - 449
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 450 - 499
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 500 - 549
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 550 - 599
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 600 - 649
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 650 - 699
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 700 - 749
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 750 - 799
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 800 - 849
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 850 - 899
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 900 - 949
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 950 - 999
+(expect "CP: Checkpoint 82" (str-to-int 16 "65618877e142a53e3638072c4bee4bda76148f08ebda917f5be6ce9147ac2a65") (sha-256-mc-test.get-result))
+(print "CP: Checkpoint 82 passed")
+(begin-tx)(sha-256-mc-test.re-seed)(commit-tx)
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 0 - 49
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 50 - 99
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 100 - 149
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 150 - 199
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 200 - 249
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 250 - 299
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 300 - 349
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 350 - 399
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 400 - 449
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 450 - 499
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 500 - 549
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 550 - 599
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 600 - 649
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 650 - 699
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 700 - 749
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 750 - 799
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 800 - 849
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 850 - 899
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 900 - 949
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 950 - 999
+(expect "CP: Checkpoint 83" (str-to-int 16 "d271c879dbd0ccaf3af1c3006521db7c1720d401a9b7df314a348ceaba0a1a4b") (sha-256-mc-test.get-result))
+(print "CP: Checkpoint 83 passed")
+(begin-tx)(sha-256-mc-test.re-seed)(commit-tx)
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 0 - 49
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 50 - 99
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 100 - 149
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 150 - 199
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 200 - 249
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 250 - 299
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 300 - 349
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 350 - 399
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 400 - 449
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 450 - 499
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 500 - 549
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 550 - 599
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 600 - 649
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 650 - 699
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 700 - 749
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 750 - 799
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 800 - 849
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 850 - 899
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 900 - 949
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 950 - 999
+(expect "CP: Checkpoint 84" (str-to-int 16 "d9fce7b3de5fa68de53434ceb45fc060e06a3583c574f635b7ee58bd4873113e") (sha-256-mc-test.get-result))
+(print "CP: Checkpoint 84 passed")
+(begin-tx)(sha-256-mc-test.re-seed)(commit-tx)
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 0 - 49
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 50 - 99
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 100 - 149
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 150 - 199
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 200 - 249
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 250 - 299
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 300 - 349
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 350 - 399
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 400 - 449
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 450 - 499
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 500 - 549
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 550 - 599
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 600 - 649
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 650 - 699
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 700 - 749
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 750 - 799
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 800 - 849
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 850 - 899
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 900 - 949
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 950 - 999
+(expect "CP: Checkpoint 85" (str-to-int 16 "fe8200e87a8ac1838ea44b7b00db22580dcf9a8c7273cee1c49452e8dbf1bf29") (sha-256-mc-test.get-result))
+(print "CP: Checkpoint 85 passed")
+(begin-tx)(sha-256-mc-test.re-seed)(commit-tx)
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 0 - 49
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 50 - 99
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 100 - 149
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 150 - 199
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 200 - 249
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 250 - 299
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 300 - 349
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 350 - 399
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 400 - 449
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 450 - 499
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 500 - 549
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 550 - 599
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 600 - 649
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 650 - 699
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 700 - 749
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 750 - 799
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 800 - 849
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 850 - 899
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 900 - 949
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 950 - 999
+(expect "CP: Checkpoint 86" (str-to-int 16 "7e79fac7b6ce2d55a7d59a9b679484a1d8fa49459d126ec343fce765be270f86") (sha-256-mc-test.get-result))
+(print "CP: Checkpoint 86 passed")
+(begin-tx)(sha-256-mc-test.re-seed)(commit-tx)
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 0 - 49
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 50 - 99
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 100 - 149
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 150 - 199
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 200 - 249
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 250 - 299
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 300 - 349
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 350 - 399
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 400 - 449
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 450 - 499
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 500 - 549
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 550 - 599
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 600 - 649
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 650 - 699
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 700 - 749
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 750 - 799
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 800 - 849
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 850 - 899
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 900 - 949
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 950 - 999
+(expect "CP: Checkpoint 87" (str-to-int 16 "511946b2cc743cf5665b060b5621adad00fe6c3c7eb5433a4bef49c8829b380f") (sha-256-mc-test.get-result))
+(print "CP: Checkpoint 87 passed")
+(begin-tx)(sha-256-mc-test.re-seed)(commit-tx)
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 0 - 49
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 50 - 99
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 100 - 149
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 150 - 199
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 200 - 249
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 250 - 299
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 300 - 349
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 350 - 399
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 400 - 449
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 450 - 499
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 500 - 549
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 550 - 599
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 600 - 649
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 650 - 699
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 700 - 749
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 750 - 799
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 800 - 849
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 850 - 899
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 900 - 949
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 950 - 999
+(expect "CP: Checkpoint 88" (str-to-int 16 "720b7a4a14c095ea8b66cd64f5f4857340a6392df4edcb50955bae04a87cd58b") (sha-256-mc-test.get-result))
+(print "CP: Checkpoint 88 passed")
+(begin-tx)(sha-256-mc-test.re-seed)(commit-tx)
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 0 - 49
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 50 - 99
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 100 - 149
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 150 - 199
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 200 - 249
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 250 - 299
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 300 - 349
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 350 - 399
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 400 - 449
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 450 - 499
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 500 - 549
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 550 - 599
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 600 - 649
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 650 - 699
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 700 - 749
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 750 - 799
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 800 - 849
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 850 - 899
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 900 - 949
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 950 - 999
+(expect "CP: Checkpoint 89" (str-to-int 16 "dee15b1016704a42341cd5c5f38d3c6e705f3862c18c019d533f1dd8f2dfa2af") (sha-256-mc-test.get-result))
+(print "CP: Checkpoint 89 passed")
+(begin-tx)(sha-256-mc-test.re-seed)(commit-tx)
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 0 - 49
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 50 - 99
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 100 - 149
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 150 - 199
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 200 - 249
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 250 - 299
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 300 - 349
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 350 - 399
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 400 - 449
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 450 - 499
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 500 - 549
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 550 - 599
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 600 - 649
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 650 - 699
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 700 - 749
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 750 - 799
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 800 - 849
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 850 - 899
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 900 - 949
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 950 - 999
+(expect "CP: Checkpoint 90" (str-to-int 16 "d5549fcfe019949f4fb603751baea22de4cb4bc9108d00d896f1182c407f68ff") (sha-256-mc-test.get-result))
+(print "CP: Checkpoint 90 passed")
+(begin-tx)(sha-256-mc-test.re-seed)(commit-tx)
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 0 - 49
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 50 - 99
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 100 - 149
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 150 - 199
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 200 - 249
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 250 - 299
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 300 - 349
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 350 - 399
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 400 - 449
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 450 - 499
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 500 - 549
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 550 - 599
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 600 - 649
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 650 - 699
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 700 - 749
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 750 - 799
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 800 - 849
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 850 - 899
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 900 - 949
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 950 - 999
+(expect "CP: Checkpoint 91" (str-to-int 16 "d1e7b64490b4dcdb121519c1275de7ccb871c84f7ea2753440b2d4b6171776bb") (sha-256-mc-test.get-result))
+(print "CP: Checkpoint 91 passed")
+(begin-tx)(sha-256-mc-test.re-seed)(commit-tx)
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 0 - 49
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 50 - 99
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 100 - 149
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 150 - 199
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 200 - 249
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 250 - 299
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 300 - 349
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 350 - 399
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 400 - 449
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 450 - 499
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 500 - 549
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 550 - 599
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 600 - 649
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 650 - 699
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 700 - 749
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 750 - 799
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 800 - 849
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 850 - 899
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 900 - 949
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 950 - 999
+(expect "CP: Checkpoint 92" (str-to-int 16 "82714b7b74e952c2dcb976fefad13456703d419734fa575e196c4fc2fab4d1ec") (sha-256-mc-test.get-result))
+(print "CP: Checkpoint 92 passed")
+(begin-tx)(sha-256-mc-test.re-seed)(commit-tx)
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 0 - 49
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 50 - 99
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 100 - 149
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 150 - 199
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 200 - 249
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 250 - 299
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 300 - 349
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 350 - 399
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 400 - 449
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 450 - 499
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 500 - 549
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 550 - 599
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 600 - 649
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 650 - 699
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 700 - 749
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 750 - 799
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 800 - 849
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 850 - 899
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 900 - 949
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 950 - 999
+(expect "CP: Checkpoint 93" (str-to-int 16 "cdfcab40b65768c42d9e4b19a25bbd22fada10b8d67855661ecaad46e3f6cc4a") (sha-256-mc-test.get-result))
+(print "CP: Checkpoint 93 passed")
+(begin-tx)(sha-256-mc-test.re-seed)(commit-tx)
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 0 - 49
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 50 - 99
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 100 - 149
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 150 - 199
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 200 - 249
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 250 - 299
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 300 - 349
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 350 - 399
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 400 - 449
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 450 - 499
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 500 - 549
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 550 - 599
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 600 - 649
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 650 - 699
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 700 - 749
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 750 - 799
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 800 - 849
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 850 - 899
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 900 - 949
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 950 - 999
+(expect "CP: Checkpoint 94" (str-to-int 16 "3aaf79c0ff115259f61da9d285cdd37bb9b56ee6849f110bc8b22920ace9193f") (sha-256-mc-test.get-result))
+(print "CP: Checkpoint 94 passed")
+(begin-tx)(sha-256-mc-test.re-seed)(commit-tx)
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 0 - 49
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 50 - 99
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 100 - 149
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 150 - 199
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 200 - 249
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 250 - 299
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 300 - 349
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 350 - 399
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 400 - 449
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 450 - 499
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 500 - 549
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 550 - 599
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 600 - 649
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 650 - 699
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 700 - 749
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 750 - 799
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 800 - 849
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 850 - 899
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 900 - 949
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 950 - 999
+(expect "CP: Checkpoint 95" (str-to-int 16 "5fad3df82219c099a48caede08f917ae896c40436aaa2bc7f5f5fc113a613d35") (sha-256-mc-test.get-result))
+(print "CP: Checkpoint 95 passed")
+(begin-tx)(sha-256-mc-test.re-seed)(commit-tx)
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 0 - 49
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 50 - 99
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 100 - 149
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 150 - 199
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 200 - 249
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 250 - 299
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 300 - 349
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 350 - 399
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 400 - 449
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 450 - 499
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 500 - 549
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 550 - 599
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 600 - 649
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 650 - 699
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 700 - 749
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 750 - 799
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 800 - 849
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 850 - 899
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 900 - 949
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 950 - 999
+(expect "CP: Checkpoint 96" (str-to-int 16 "99c57beb53f4c3bec08b02d3ae4ad9543432584877609c614411b966c195e4d9") (sha-256-mc-test.get-result))
+(print "CP: Checkpoint 96 passed")
+(begin-tx)(sha-256-mc-test.re-seed)(commit-tx)
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 0 - 49
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 50 - 99
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 100 - 149
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 150 - 199
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 200 - 249
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 250 - 299
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 300 - 349
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 350 - 399
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 400 - 449
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 450 - 499
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 500 - 549
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 550 - 599
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 600 - 649
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 650 - 699
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 700 - 749
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 750 - 799
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 800 - 849
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 850 - 899
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 900 - 949
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 950 - 999
+(expect "CP: Checkpoint 97" (str-to-int 16 "bda6e27f332699478162019fb80f71e13ca1b14027212b372a7c08b2e3655a97") (sha-256-mc-test.get-result))
+(print "CP: Checkpoint 97 passed")
+(begin-tx)(sha-256-mc-test.re-seed)(commit-tx)
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 0 - 49
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 50 - 99
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 100 - 149
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 150 - 199
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 200 - 249
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 250 - 299
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 300 - 349
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 350 - 399
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 400 - 449
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 450 - 499
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 500 - 549
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 550 - 599
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 600 - 649
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 650 - 699
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 700 - 749
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 750 - 799
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 800 - 849
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 850 - 899
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 900 - 949
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 950 - 999
+(expect "CP: Checkpoint 98" (str-to-int 16 "e711c08350ea0e087f5594c77d5dfb8334335e87101fc9705b31e7f428005ae4") (sha-256-mc-test.get-result))
+(print "CP: Checkpoint 98 passed")
+(begin-tx)(sha-256-mc-test.re-seed)(commit-tx)
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 0 - 49
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 50 - 99
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 100 - 149
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 150 - 199
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 200 - 249
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 250 - 299
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 300 - 349
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 350 - 399
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 400 - 449
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 450 - 499
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 500 - 549
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 550 - 599
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 600 - 649
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 650 - 699
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 700 - 749
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 750 - 799
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 800 - 849
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 850 - 899
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 900 - 949
+(begin-tx)(sha-256-mc-test.iterate 50)(commit-tx) ; 950 - 999
+(expect "CP: Checkpoint 99" (str-to-int 16 "91370c8e23ca9d4b724fe1a5c0a13e2cedb7949f04e625441bf868259894727f") (sha-256-mc-test.get-result))
+(print "CP: Checkpoint 99 passed")
