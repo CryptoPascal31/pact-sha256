@@ -5,8 +5,8 @@ MSG_RE = re.compile("Msg ?= ?(\w+)")
 LEN_RE = re.compile("Len ?= ?(\d+)")
 
 len_list = []
-
-
+print('(enforce-pact-version "5.0")')
+print("(begin-tx)")
 print('(load "sha256.pact")')
 print("(use sha256_mod)")
 print("(module test_cases G (defcap G() true)")
@@ -42,6 +42,7 @@ with open("test_suites/SHA256LongMsg.rsp") as fd:
     handle_test_file(fd)
 
 print(")")
+print("(commit-tx)")
 
 for i in len_list:
-    print('(expect "LEN={0:d}" MD-{0:d} (digest (pad-int {0:d} MSG-{0:d})))'.format(i))
+    print('(begin-tx)\n   (expect "LEN={0:d}" test_cases.MD-{0:d} (sha256_mod.digest (sha256_mod.pad-int {0:d} test_cases.MSG-{0:d})))\n(commit-tx)\n'.format(i))
