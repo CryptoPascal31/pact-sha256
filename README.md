@@ -35,4 +35,4 @@ make tests
 ```
 
 ### Gas
-Roughly 5200 Gas / block.
+Roughly 1200 Gas / block.

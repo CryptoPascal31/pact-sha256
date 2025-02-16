@@ -12,7 +12,7 @@ test-msg: sha256-msg-tests.repl
 	@echo ""
 
 test-gas:
-	${PACT} sha256-gas-tests.repl
+	${PACT} sha256-gas-tests.repl |grep "GAS:"
 	@echo ""
 
 
