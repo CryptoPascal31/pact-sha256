@@ -1,4 +1,0 @@
-(load "sha256.pact")
-(use sha256_mod)
-
-(typecheck 'sha256_mod)

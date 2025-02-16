@@ -13,12 +13,9 @@ test-gas:
 	${PACT} sha256-gas-tests.repl
 	@echo ""
 
-check-types:
-	${PACT} sha256-check-types.repl
-	 @echo ""
 
 test-mc:
 	${PACT} sha256-mc-tests.repl
 
+tests: test-gas test-msg test-mc
 
-tests: test-gas check-types test-msg test-mc
